@@ -1,6 +1,6 @@
 import { abiDecoder, Account, IProvider, utils } from '@klever/sdk-node'
 import { TimeBetweenRetries, Retries } from '../constants';
-import { createCertificateRequest, revokeCertificateRequest, getProof, getEventData } from '../api';
+import { createCertificateRequest, revokeCertificateRequest, getCertificateIdByHash, getProof, getEventData } from '../api';
 import { flattenJSON, hashKeyValue, prepareCreateCertificateData, prepareRevokeCertificateData, retry } from "../utils";
 import { contractABI, AuditType } from '../abi';
 
@@ -13,31 +13,6 @@ export type EventsResponse = {
     issuanceDate: number;
     expirationDate: number;
 }
-
-export interface TransactionResponse {
-    data: {
-      transaction: {
-        logs: {
-          events: {
-            address: string;
-            identifier: string;
-            topics: string[];
-            data: string[];
-            order: number;
-          }[];
-        };
-      };
-    };
-    error: string;
-    code: string;
-  };
-
-export type ProofCertificateResponse = {
-    data: {
-        data: string;
-    }
-}
-
 export class Certificate {
     private account: Account
     private nodeApi: string
@@ -81,14 +56,9 @@ export class Certificate {
       return await revokeCertificateRequest(this.account, this.contractAddress, callInput)
     }
 
-    async getCertificateIdByTransaction(txHash: string) : Promise<string> {
-        // Get certificate ID from transaction
+    async getCertificateIdByHash(hash: string) : Promise<string> {
         return await retry(
-            async () => {
-              const response = await fetch(`${this.proxyApi}/transaction/${txHash}?withResults=true`)
-              const result: TransactionResponse = await response.json()
-              return result.data.transaction.logs.events[0].data[0]
-            },
+            async () => getCertificateIdByHash(this.proxyApi, hash),
             Retries,
             TimeBetweenRetries
           )

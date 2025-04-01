@@ -8,6 +8,24 @@ type ProofCertificateResponse = {
     }
 }
 
+interface TransactionResponse {
+  data: {
+    transaction: {
+      logs: {
+        events: {
+          address: string;
+          identifier: string;
+          topics: string[];
+          data: string[];
+          order: number;
+        }[];
+      };
+    };
+  };
+  error: string;
+  code: string;
+};
+
 export async function createCertificateRequest(account: Account, contractAddress: string, callInput : string) {
     await account.sync()
 
@@ -53,6 +71,13 @@ export async function revokeCertificateRequest(account: Account, contractAddress
     const broadcastRes = await account.broadcastTransactions([signedTx])
 
     return broadcastRes.data.txsHashes[0]
+}
+
+export async function getCertificateIdByHash(apiUrl: string, hash: string): Promise<string> {
+    const response = await fetch(`${apiUrl}/transaction/${hash}?withResults=true`)
+    const result: TransactionResponse = await response.json()
+    
+    return result.data.transaction.logs.events[0].data[0]
 }
 
 export async function getProof(nodeUrl: string, contractAddress: string, certificateId: string, inputContract: string): Promise<boolean> {
