@@ -1,8 +1,8 @@
-import { SmartContractType, InvokeType, TimeBetweenRetries, Retries } from "./constants"
+import { SmartContractType, InvokeType, TimeBetweenRetries, Retries } from './constants'
 
 export {
-    SmartContractType,
-    InvokeType,
-    TimeBetweenRetries,
-    Retries
+  SmartContractType,
+  InvokeType,
+  TimeBetweenRetries,
+  Retries
 }

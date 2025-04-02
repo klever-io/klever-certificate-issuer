@@ -1,57 +1,58 @@
-const MAX_DEPTH = 3
-const MAX_SIZE = 32
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { hashKeyValue } from './hash'
 import { CREATE_CERTIFICATE, REVOKE_CERTIFICATE } from '../abi'
 
+const MAX_DEPTH = 3
+const MAX_SIZE = 32
+
 export async function flattenJSON(obj: object,
-    parentKey = '',
-    depth = 0): Promise<object> {
-    if (depth >= MAX_DEPTH) {
-      return Promise.reject(new Error('Depth limit exceeded'))
-    }
+  parentKey = '',
+  depth = 0): Promise<object> {
+  if (depth >= MAX_DEPTH) {
+    return Promise.reject(new Error('Depth limit exceeded'))
+  }
 
-    const result: Record<string, any> = {}
+  const result: Record<string, any> = {}
 
-    for (const key of Object.keys(obj)) {
-      const newKey = parentKey ? `${parentKey}.${key}` : key
-      if (typeof (obj as any)[key] === 'object' && (obj as any)[key] !== null) {
-        try {
-          Object.assign(result,
-            await flattenJSON((obj as any)[key], newKey, depth + 1)
-          )
-        } catch (error) {
-          return Promise.reject(error)
-        }
-      } else {
-        result[newKey] = (obj as any)[key]
+  for (const key of Object.keys(obj)) {
+    const newKey = parentKey ? `${parentKey}.${key}` : key
+    if (typeof (obj as any)[key] === 'object' && (obj as any)[key] !== null) {
+      try {
+        Object.assign(result,
+          await flattenJSON((obj as any)[key], newKey, depth + 1)
+        )
+      } catch (error) {
+        return Promise.reject(error)
       }
+    } else {
+      result[newKey] = (obj as any)[key]
     }
+  }
 
-    if (Object.keys(result).length > MAX_SIZE) {
-      return Promise.reject(new Error('Size limit exceeded'))
-    }
-    return result
+  if (Object.keys(result).length > MAX_SIZE) {
+    return Promise.reject(new Error('Size limit exceeded'))
+  }
+  return result
 }
 
 export async function unflattenJSON(obj:object) {
-    const result: Record<string, any> = {}
+  const result: Record<string, any> = {}
 
-    for (const key of Object.keys(obj)) {
-      const keys = key.split('.')
-      let current = result
+  for (const key of Object.keys(obj)) {
+    const keys = key.split('.')
+    let current = result
 
-      for (let i = 0; i < keys.length - 1; i++) {
-        if (!current[keys[i]] || typeof current[keys[i]] !== 'object') {
-          current[keys[i]] = {}
-        }
-        current = current[keys[i]]
+    for (let i = 0; i < keys.length - 1; i++) {
+      if (!current[keys[i]] || typeof current[keys[i]] !== 'object') {
+        current[keys[i]] = {}
       }
-
-      current[keys[keys.length - 1]] = (obj as any)[key]
+      current = current[keys[i]]
     }
 
-    return result
+    current[keys[keys.length - 1]] = (obj as any)[key]
+  }
+
+  return result
 }
 
 export async function prepareCreateCertificateData(input: object) {
@@ -72,5 +73,5 @@ export async function prepareCreateCertificateData(input: object) {
 export async function prepareRevokeCertificateData(certificateId: string) {
   const data = [`${REVOKE_CERTIFICATE}@`, certificateId].join('')
 
-  return  Buffer.from(data).toString('base64')
+  return Buffer.from(data).toString('base64')
 }

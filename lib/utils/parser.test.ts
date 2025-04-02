@@ -20,12 +20,12 @@ describe('flattenJSON', () => {
   })
 
   it('should flatten up to MAX_SIZE and throw if exceeded', async () => {
-    const input = { 
-       arr1: [1,2,3,4,5,6,7,8,9,10],
-       arr2: [1,2,3,4,5,6,7,8,9,10],
-       arr3: [1,2,3,4,5,6,7,8,9,10],
-       arr4: [1,2,3,4,5,6,7,8,9,10],
-      }
+    const input = {
+      arr1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      arr2: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      arr3: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      arr4: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    }
 
     await expect(flattenJSON(input)).rejects.toThrow('Size limit exceeded')
   })
@@ -47,7 +47,7 @@ describe('flattenJSON', () => {
   })
 
   it('should flatten multiple arrays as objects', async () => {
-    const input = { arr: [1, 2, { x: 3 }] , arr2 : [4] }
+    const input = { arr: [1, 2, { x: 3 }], arr2: [4] }
     const output = await flattenJSON(input)
     expect(output).toEqual({
       'arr.0': 1,
@@ -63,13 +63,12 @@ describe('flattenJSON', () => {
     expect(output).toEqual({})
   })
 
-    it('should flatten a simple object', async () => {
+  it('should flatten a simple object', async () => {
     const input = { a: 1, b: 2 }
     const output = await flattenJSON(input)
     expect(output).toEqual({ a: 1, b: 2 })
   })
 })
-
 
 describe('unflattenJSON', () => {
   it('should unflatten a simple flat object', async () => {

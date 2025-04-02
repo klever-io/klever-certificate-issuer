@@ -25,10 +25,10 @@ describe('hashKeyValue', () => {
   })
 
   it('should hash with empty key or value', () => {
-    const expected1 = keccak256(`:value`)
+    const expected1 = keccak256(':value')
     expect(hashKeyValue('', 'value')).toBe(expected1)
 
-    const expected2 = keccak256(`key:`)
+    const expected2 = keccak256('key:')
     expect(hashKeyValue('key', '')).toBe(expected2)
   })
 
