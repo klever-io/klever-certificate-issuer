@@ -11,7 +11,8 @@
   "license": "MIT",
   "scripts": {
     "prepublishOnly": "yarn build",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "test": "vitest run"
   },
   "dependencies": {
     "@klever/sdk-node": "^2.4.0",

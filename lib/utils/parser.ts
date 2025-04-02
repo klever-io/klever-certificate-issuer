@@ -1,4 +1,5 @@
 const MAX_DEPTH = 3
+const MAX_SIZE = 32
 
 import { hashKeyValue } from './hash'
 import { CREATE_CERTIFICATE, REVOKE_CERTIFICATE } from '../abi'
@@ -27,6 +28,9 @@ export async function flattenJSON(obj: object,
       }
     }
 
+    if (Object.keys(result).length > MAX_SIZE) {
+      return Promise.reject(new Error('Size limit exceeded'))
+    }
     return result
 }
 
