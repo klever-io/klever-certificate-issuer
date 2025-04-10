@@ -1,6 +1,6 @@
 export const contractABI = JSON.stringify({
   types: {
-    Audit: {
+    CertificateEvents: {
       type: 'struct',
       fields: [
         {
@@ -12,17 +12,19 @@ export const contractABI = JSON.stringify({
           type: 'u64'
         },
         {
-          name: 'is_valid',
-          type: 'bool'
-        }
+          name: 'revoked_date',
+          type: 'u64'
+        },
       ]
     }
   }
 })
 
-export const CREATE_CERTIFICATE = 'create_certificate'
-export const PROOF_CERTIFICATE = 'proof_certificate'
-export const REVOKE_CERTIFICATE = 'revoke_certificate'
-export const AUDIT_CERTIFICATE = 'audit_certificate'
+export const CREATE_CERTIFICATE = 'create'
+export const CHECK_CERTIFICATE = 'check'
+export const PROOF_CERTIFICATE = 'proof'
+export const REVOKE_CERTIFICATE = 'revoke'
+export const GET_CERTIFICATE_EVENTS = 'get_certificate_events'
+export const CHANGE_CERTIFICATE_EXPIRATION_DATE = 'change_expiration_date'
 
-export const AuditType = 'Audit'
+export const CertificateEventsType = 'CertificateEvents'

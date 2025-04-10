@@ -1,3 +1,15 @@
-import { createCertificateRequest, revokeCertificateRequest, getProof, getCertificateIdByHash, getEventData } from './api'
+import {
+  invokeRequest,
+  getProof,
+  getCertificateIdByHash,
+  getEventData,
+  getCertificationStatus
+} from './api'
 
-export { createCertificateRequest, revokeCertificateRequest, getProof, getCertificateIdByHash, getEventData }
+export {
+  invokeRequest,
+  getProof,
+  getCertificateIdByHash,
+  getEventData,
+  getCertificationStatus
+}

@@ -1,44 +1,63 @@
 import { abiDecoder, Account, IProvider, utils } from '@klever/sdk-node'
 import { TimeBetweenRetries, Retries } from '../constants'
-import { createCertificateRequest, revokeCertificateRequest, getCertificateIdByHash, getProof, getEventData } from '../api'
-import { flattenJSON, hashKeyValue, prepareCreateCertificateData, prepareRevokeCertificateData, retry } from '../utils'
-import { contractABI, AuditType } from '../abi'
+import {
+  invokeRequest,
+  getCertificateIdByHash,
+  getProof,
+  getEventData,
+  getCertificationStatus
+} from '../api'
+import {
+  flattenJSON,
+  hashKeyValue,
+  prepareCreateCertificateData,
+  prepareRevokeCertificateData,
+  prepareChangeExpirationDateData,
+  retry
+} from '../utils'
+import { contractABI, CertificateEventsType } from '../abi'
 
 export type InputCreateCertificate = {
   [key:string]: string | number | boolean | object;
 }
 
 export type EventsResponse = {
-  isValid: boolean;
   issuanceDate: number;
   expirationDate: number;
+  revokedDate: number;
 }
 export class Certificate {
   private account: Account
   private nodeApi: string
   private proxyApi: string
+  private salt: string
 
   constructor(private contractAddress: string,
     provider: IProvider,
-    privateKey: string) {
+    privateKey: string, salt: string) {
     this.account = new Account(privateKey, false)
     this.contractAddress = contractAddress
     this.nodeApi = provider.node
     this.proxyApi = provider.api
+    this.salt = salt
     privateKey = ''
 
     utils.setProviders(provider)
   }
 
-  async create(input: InputCreateCertificate) : Promise<string> {
+  async create(inputs: InputCreateCertificate, expirationDate: number = 0) : Promise<string> {
     // Flatten given input
-    const flattenData = await flattenJSON(input)
+    const flattenData = await flattenJSON(inputs)
 
     // Convert flatten data to create certificate partern
-    const callInput = await prepareCreateCertificateData(flattenData)
+    const callInput = await prepareCreateCertificateData(flattenData, expirationDate, this.salt)
 
     // Prepare and Broadcast TX
-    return await createCertificateRequest(this.account, this.contractAddress, callInput)
+    return await invokeRequest(this.account, this.contractAddress, callInput)
+  }
+
+  async check(certificateId: string) : Promise<boolean> {
+    return await getCertificationStatus(this.nodeApi, this.contractAddress, certificateId)
   }
 
   async proof(certificateId: string, key: string, value: string) : Promise<boolean> {
@@ -52,7 +71,13 @@ export class Certificate {
   async revoke(certificateId: string) : Promise<string> {
     const callInput = await prepareRevokeCertificateData(certificateId)
 
-    return await revokeCertificateRequest(this.account, this.contractAddress, callInput)
+    return await invokeRequest(this.account, this.contractAddress, callInput)
+  }
+
+  async changeExpirationDate(certificateId: string, expirationDate: number) : Promise<string> {
+    const callInput = await prepareChangeExpirationDateData(certificateId, expirationDate)
+
+    return await invokeRequest(this.account, this.contractAddress, callInput)
   }
 
   async getCertificateIdByHash(hash: string) : Promise<string> {
@@ -68,12 +93,12 @@ export class Certificate {
     const eventsHex = await getEventData(this.nodeApi, this.contractAddress, certificateId)
 
     // Decode events
-    const decodedEvents = abiDecoder.decodeStruct(eventsHex, AuditType, contractABI)
+    const decodedEvents = abiDecoder.decodeStruct(eventsHex, CertificateEventsType, contractABI)
 
     return {
-      isValid: decodedEvents.is_valid,
       issuanceDate: Number(decodedEvents.issuance_date),
-      expirationDate: Number(decodedEvents.expiration_date)
+      expirationDate: Number(decodedEvents.expiration_date),
+      revokedDate: Number(decodedEvents.revoked_date)
     }
   }
 }
