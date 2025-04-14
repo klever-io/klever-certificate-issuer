@@ -72,14 +72,14 @@ export async function getCertificationStatus(nodeUrl: string, contractAddress: s
   return result.data.data === '01'
 }
 
-export async function getProof(nodeUrl: string, contractAddress: string, certificateId: string, inputContract: string): Promise<boolean> {
+export async function getProof(nodeUrl: string, contractAddress: string, certificateId: string, inputContract: string, salt: string): Promise<boolean> {
   const response = await fetch(`${nodeUrl}/vm/hex`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       scAddress: contractAddress,
       funcName: PROOF_CERTIFICATE,
-      args: [certificateId, inputContract]
+      args: [certificateId, salt, inputContract]
     })
   })
 

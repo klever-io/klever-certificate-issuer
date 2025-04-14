@@ -1,5 +1,6 @@
 import { abiDecoder, Account, IProvider, utils } from '@klever/sdk-node'
 import { TimeBetweenRetries, Retries } from '../constants'
+
 import {
   invokeRequest,
   getCertificateIdByHash,
@@ -16,10 +17,6 @@ import {
   retry
 } from '../utils'
 import { contractABI, CertificateEventsType } from '../abi'
-
-export type InputCreateCertificate = {
-  [key:string]: string | number | boolean | object;
-}
 
 export type EventsResponse = {
   issuanceDate: number;
@@ -39,13 +36,13 @@ export class Certificate {
     this.contractAddress = contractAddress
     this.nodeApi = provider.node
     this.proxyApi = provider.api
-    this.salt = salt
+    this.salt = hashKeyValue('salt', salt)
     privateKey = ''
 
     utils.setProviders(provider)
   }
 
-  async create(inputs: InputCreateCertificate, expirationDate: number = 0) : Promise<string> {
+  async create(inputs: object, expirationDate: number = 0) : Promise<string> {
     // Flatten given input
     const flattenData = await flattenJSON(inputs)
 
@@ -65,7 +62,12 @@ export class Certificate {
     const inputContract = hashKeyValue(key, value)
 
     // Check proof in Certificate contract
-    return await getProof(this.nodeApi, this.contractAddress, certificateId, inputContract)
+    return await getProof(this.nodeApi,
+      this.contractAddress,
+      certificateId,
+      inputContract,
+      this.salt
+    )
   }
 
   async revoke(certificateId: string) : Promise<string> {

@@ -57,16 +57,16 @@ export async function unflattenJSON(obj:object) {
 }
 
 export async function prepareCreateCertificateData(input: object, expirationDate: number, salt: string) {
-  const dataVec = []
+  const inputs = []
 
   for (const [field, value] of Object.entries(input)) {
     const hash = hashKeyValue(field, value)
-    dataVec.push(hash)
+    inputs.push(hash)
   }
 
   const expirationDateEncoded = abiEncoder.encodeABIValue(expirationDate, 'u64')
 
-  const dataString = [CREATE_CERTIFICATE, expirationDateEncoded, salt, dataVec.join('')]
+  const dataString = [CREATE_CERTIFICATE, expirationDateEncoded, salt, inputs.join('')]
     .join('@')
 
   return Buffer.from(dataString).toString('base64')
@@ -75,7 +75,7 @@ export async function prepareCreateCertificateData(input: object, expirationDate
 export async function prepareChangeExpirationDateData(certificateId: string, expirationDate: number) {
   const expirationDateEncoded = abiEncoder.encodeABIValue(expirationDate, 'u64')
 
-  const dataString = [CHANGE_CERTIFICATE_EXPIRATION_DATE, expirationDateEncoded]
+  const dataString = [CHANGE_CERTIFICATE_EXPIRATION_DATE, certificateId, expirationDateEncoded]
     .join('@')
 
   return Buffer.from(dataString).toString('base64')
