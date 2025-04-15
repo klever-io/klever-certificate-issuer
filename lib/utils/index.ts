@@ -1,5 +1,11 @@
 import { hashKeyValue } from './hash'
-import { flattenJSON, unflattenJSON, prepareCreateCertificateData, prepareRevokeCertificateData } from './parser'
+import {
+  flattenJSON,
+  unflattenJSON,
+  prepareCreateCertificateData,
+  prepareRevokeCertificateData,
+  prepareChangeExpirationDateData
+} from './parser'
 import { retry } from './retry'
 
 export {
@@ -8,5 +14,6 @@ export {
   unflattenJSON,
   prepareCreateCertificateData,
   prepareRevokeCertificateData,
+  prepareChangeExpirationDateData,
   retry
 }

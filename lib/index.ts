@@ -1,3 +1,5 @@
-import { Certificate, InputCreateCertificate, EventsResponse } from './certificate'
+import { Certificate, EventsResponse } from './certificate'
+import { flattenJSON, unflattenJSON } from './utils'
+import { IProvider } from '@klever/sdk-node'
 
-export { Certificate, InputCreateCertificate, EventsResponse }
+export { Certificate, EventsResponse, IProvider, flattenJSON, unflattenJSON }
