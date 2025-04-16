@@ -116,6 +116,9 @@ The input will be converted inside the create method to:
 }
 ```
 
+> ⚠️ **Important Note:**  
+> The smart contract **does not automatically handle certificate expiration**. It is the responsibility of the application integrating this package to validate the `expirationDate` field externally, ensuring that expired certificates are treated accordingly in the final solution. you can check the timestamps (issue, revoke and expirationDate) by calling getEvents method
+
 ---
 
 ### `check(certificateId: string): Promise<boolean>`
