@@ -116,9 +116,6 @@ The input will be converted inside the create method to:
 }
 ```
 
-> ⚠️ **Important Note:**  
-> The smart contract **does not automatically handle certificate expiration**. It is the responsibility of the application integrating this package to validate the `expirationDate` field externally, ensuring that expired certificates are treated accordingly in the final solution. you can check the timestamps (issue, revoke and expirationDate) by calling getEvents method
-
 ---
 
 ### `check(certificateId: string): Promise<boolean>`
@@ -127,6 +124,10 @@ Checks if a certificate is active on the blockchain.
 
 - `certificateId`: ID of the certificate to be checked.
 - **Returns**: `true` if the certificate is valid, `false` otherwise.
+
+> ⚠️ **Revocation & Expiration Handling:**  
+> A certificate is considered **invalid** if it has a `revokedDate` set (greater than `0`) **and** the current timestamp is greater than the `expirationDate`.  
+> If `expirationDate` is `0`, the certificate **does not expire** and must only be considered invalid if revoked.
 
 ---
 
